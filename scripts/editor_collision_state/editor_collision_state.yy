@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"editor_collision_state",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"editor_collision_state",
+  "parent":{
+    "name":"editor",
+    "path":"folders/Scripts/editor.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}
