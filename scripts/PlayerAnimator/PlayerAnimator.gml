@@ -17,6 +17,9 @@ function PAnim_Step(){
 			_temp = "wall"
 	}
 	
+	if(invuln_time > 0 && invuln_time < 16)
+		_temp = "hurt"
+	
 	if(anim_name != _temp){
 		anim_name = _temp;
 		anim_timer = 0;
@@ -75,6 +78,7 @@ function PAnim_Init(){
 		new PAnim_Define("wall", [3, 5], x_wall),
 		new PAnim_Define("wall_jump", [1, 3, 4], x_wall_jump),
 		new PAnim_Define("dash", [2, 4], x_dash),
+		new PAnim_Define("hurt", [1, 2, 3], x_hurt, true),
 	]
 }
 

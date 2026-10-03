@@ -5,8 +5,8 @@
   "isDnD":false,
   "name":"MakeLevel",
   "parent":{
-    "name":"Scripts",
-    "path":"folders/Scripts.yy",
+    "name":"editor",
+    "path":"folders/Scripts/editor.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

@@ -2,6 +2,32 @@ function Player_Handle(){
 	input.update();
 	if(keyboard_check(vk_shift) && !input.get_pressed("shoot")) return;
 	
+	if(invuln_time > 0 && invuln_time < 16){
+		snes_physics.move_horizontal(0, dash_direction, 0.75);
+		invuln_time++;
+		snes_physics.step()
+		snes_physics.facing_direction = dash_direction;
+		x = floor(snes_physics.x);
+		y = floor(snes_physics.y);
+		PAnim_Step();
+		return;
+	} else if(invuln_time > 0){
+		invuln_time++;
+		if(invuln_max < invuln_time)
+			invuln_time = 0;
+	} else if(instance_place(x, y, Hurtbox)){
+		invuln_time = true;
+		dash_direction = snes_physics.facing_direction;
+		snes_physics.vspd = -2;
+		dash_jumping = false;
+		player_data.hp -= instance_place(x, y, Hurtbox).damage;
+		
+		if(player_data.hp <= 0){
+			room_restart();
+		}
+		return;
+	}
+	
 	if(dashing != false){
 		snes_physics.move_horizontal(dash_direction, 0, player_data.dashSpeed);
 		
@@ -80,19 +106,59 @@ function Player_Handle(){
 	
 	PAnim_Step();
 	
-	
+	if(instance_exists(EditObject) && keyboard_check_pressed(vk_escape)){
+		with(EditObject){
+			state = "collision"
+			x = other.camera.x - GAME_W / 2
+			y = other.camera.y - GAME_H / 2
+			player_test_start_x = other.x;
+			player_test_start_y = other.y;
+		}
+		instance_destroy(camera)
+		instance_destroy(self)
+	}
 }
 
 function player_draw(){
+	
 	
 	if(dashing || dash_jumping){
 		PAnim_Draw(floor(old_positions[11].x), floor(old_positions[11].y), #4444bb);
 		PAnim_Draw(floor(old_positions[7].x), floor(old_positions[7].y), #6666dd);
 		PAnim_Draw(floor(old_positions[3].x), floor(old_positions[3].y), #8888ff);
 	}
+	if(invuln_time mod 2 == 0)
 	PAnim_Draw(floor(snes_physics.x), floor(snes_physics.y));
 	draw_text(0, 0, snes_physics.grounded)
 	other.image_xscale = snes_physics.facing_direction;
+}
+
+function player_draw_gui(){
+	draw_set_color(#cbdbfc)
+	draw_rectangle(0,0,GAME_W, 15, false)
+	draw_set_color(#306082)
+	draw_rectangle(0,15,GAME_W, 15, false)
+	draw_set_color(#222034)
+	draw_rectangle(112,0,113, 15, false)
+	
+	for(var e = 0; e < player_data.max_hp; e++){
+		if(e > player_data.hp - 1)
+			draw_sprite(zx_hud_health_empty, 0, 15 + e * 3, 0)
+		else if(e mod 3 == 2)
+			draw_sprite(zx_hud_health_notch, 0, 15 + e * 3, 0)
+		else
+			draw_sprite(zx_hud_health_nugget, 0, 15 + e * 3, 0)
+	}
+	draw_sprite(zx_hud_health_cap, 0, 13, 0);
+	for(var e = 0; e < 30; e++){
+		if(e mod 3 == 2)
+			draw_sprite_ext(zx_hud_health_notch_evil, 0, 15 + e * 3, 15, 1, -1, 0, c_white, 1)
+		else
+			draw_sprite_ext(zx_hud_health_nugget_evil, 0, 15 + e * 3, 15, 1, -1, 0, c_white, 1)
+	}
+	draw_sprite_ext(zx_hud_health_cap, 0, 13, 15, 1, -1, 0, c_white, 1);
+	
+	draw_string(player_data.hp, 0, 0)
 }
 
 function Player_Start(){
@@ -104,6 +170,9 @@ function Player_Start(){
 	dash_max_time = 30;
 	dash_direction = 1;
 	dash_jumping = false;
+	
+	invuln_time = 0;
+	invuln_max = 90;
 	
 	old_positions = array_create(15, {x: 0, y: 0});
 	

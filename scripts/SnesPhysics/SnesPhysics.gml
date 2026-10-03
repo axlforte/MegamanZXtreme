@@ -17,7 +17,7 @@ function SPhysics(_x, _y) constructor{
 	
 	facing_direction = 1;
 	
-	step = function(){
+	step = function(_autohold){
 		if(hspd != 0) {
 			facing_direction = sign(hspd);
 		}
@@ -90,18 +90,9 @@ function SPhysics(_x, _y) constructor{
 	
 	gravity_loop = function(){
 		if(!detect_collision(x, y)){
-			if (can_wall_jump && hspd != 0){
+			if (can_wall_jump && hspd != 0 && vspd >= 0){
 				
-				if(!slide_tick && vspd <= 0){
-					slide_tick = true;
-				} else if(slide_tick){
-					if(slide_tick > 2){
-						vspd = 1
-					} else {
-						vspd = 0;
-					}
-					slide_tick++;
-				}
+				vspd = 1;
 			} else
 				vspd = clamp(vspd + grav, -10000, 6);
 		} else {
